@@ -1,0 +1,9 @@
+editor = "hx"
+
+[user]
+name = "Alex Launi"
+email = "dev@launi.me"
+
+[ui]
+editor = "hx"
+diff-editor = ":builtin"
