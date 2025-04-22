@@ -1,14 +1,17 @@
-{ inputs, pkgs, ... }:
-let
-  inherit (inputs) nixpkgs;
-in
+{ pkgs, ... }:
 {
   nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = [
     pkgs.arc-browser
     pkgs.ripgrep
     pkgs.nushell
     pkgs.gh
+    pkgs.nixd
+    pkgs.uv
+    pkgs.du-dust
+    pkgs.uutils-coreutils
+    pkgs.tree
+    # ripgrep
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.beszel
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.talosctl
 
@@ -48,7 +51,6 @@ in
     # nerdfonts
     # nmap
     # qemu
-    # ripgrep
     # skopeo
     # smartmontools
     # television
