@@ -5,12 +5,13 @@ format = """
 $os\
 $username$hostname\
 [](bg:color_yellow fg:color_orange)\
-$directory\
+$directory(${custom.flake})\
 [](fg:color_yellow bg:color_aqua)\
 $git_branch\
 $git_status\
-$custom.jj\
+${custom.jj}\
 [](fg:color_aqua bg:color_blue)\
+$nix_shell\
 $c\
 $rust\
 $golang\
@@ -119,6 +120,19 @@ symbol = ""
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
+[nix_shell]
+symbol = "❄️ "
+style = "bg:color_blue"
+format = '[[ $symbol($state) ](fg:color_fg0 bg:color_blue)]($style)'
+disabled = false
+
+# For flakes specifically
+[custom.flake]
+when = "test -e flake.nix"
+symbol = "❄️ "
+style = "bg:color_yellow fg:color_orange"
+format = '[$symbol(flake)]($style)'
+
 [golang]
 symbol = ""
 style = "bg:color_blue"
@@ -181,13 +195,14 @@ vimcmd_visual_symbol = '[](bold fg:color_yellow)'
 ignore_timeout = true
 description = "The current jj status"
 detect_folders = [".jj"]
-symbol = "🥋 "
+symbol = " "
 style = "bg:color_aqua fg:color_fg0"
-format = '[[  $symbol$output ](fg:color_fg0 bg:color_aqua)]($style)'
+# format = '[[ $symbol$output](fg:color_fg0 bg:color_aqua)]($style)'
+format = '[[ $symbol$output](fg:color_fg0 bg:color_aqua)]($style)'
 command = '''
 jj log --revisions @ --no-graph --ignore-working-copy --color never --limit 1 --template '
   separate(" ",
-    change_id.shortest(4),
+    raw_escape_sequence("\x1b[1;93m") ++ change_id.shortest(8).prefix() ++ raw_escape_sequence("\x1b[22;37m") ++ change_id.shortest(8).rest(),
     bookmarks,
     "|",
     concat(
@@ -200,7 +215,7 @@ jj log --revisions @ --no-graph --ignore-working-copy --color never --limit 1 --
     raw_escape_sequence("\x1b[1;32m") ++ coalesce(
       truncate_end(29, description.first_line(), "…"),
       "(no description set)",
-    ) ++ raw_escape_sequence("\x1b[0m"),
+    ) ++ raw_escape_sequence("\x1b[0m")
   )
 '
 '''

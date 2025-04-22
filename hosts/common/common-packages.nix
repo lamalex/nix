@@ -8,6 +8,7 @@ in
     pkgs.arc-browser
     pkgs.ripgrep
     pkgs.nushell
+    pkgs.gh
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.beszel
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.talosctl
 
