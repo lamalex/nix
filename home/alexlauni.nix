@@ -1,14 +1,8 @@
-{ config, inputs, pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   home.stateVersion = "23.11";
 
-  xdg.configFile."ghostty/config".text = ''
-    # Ghostty configuration
-    font-family = "JetBrains Mono"
-    font-size = 14
-    theme = "nord"
-  '';
-
+  xdg.configFile."ghostty/config".text = builtins.readFile ./ghostty/config;
   # list of programs
   # https://mipmip.github.io/home-manager-option-search
 
@@ -20,6 +14,12 @@
   # ];
 
   programs.gpg.enable = true;
+  programs.nushell = {
+    enable = true;
+    configFile = {
+      source = ./nu/config.nu;
+    };
+  };
 
   programs.carapace = {
     enable = true;
@@ -32,6 +32,10 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+  };
+
+  programs.fd = {
+    enable = true;
   };
 
   programs.eza = {

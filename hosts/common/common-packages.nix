@@ -4,13 +4,14 @@
   environment.systemPackages = [
     pkgs.arc-browser
     pkgs.ripgrep
-    pkgs.nushell
     pkgs.gh
     pkgs.nixd
     pkgs.uv
     pkgs.du-dust
     pkgs.uutils-coreutils
     pkgs.tree
+    pkgs.sd
+    pkgs.dogdns
     # ripgrep
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.beszel
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.talosctl

@@ -65,13 +65,18 @@ in
     };
     global.autoUpdate = true;
 
-    brews = [
-		"mas"
-    ];
     taps = [
       "homebrew/core"
       "homebrew/cask"
     ];
+
+    brews = [
+  		"mas"
+      "podman"
+      "podman-compose"
+      "podman-tui"
+    ];
+
     casks = [
       #"nikitabobko/tap/aerospace"
       "discord"
@@ -84,6 +89,7 @@ in
       # "warp"
       "visual-studio-code"
       "ghostty"
+      "podman-desktop"
     ];
     masApps = {
       "Keynote" = 409183694;
