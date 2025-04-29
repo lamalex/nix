@@ -30,6 +30,7 @@ in
     # pkgs.just
     pkgs.lima
     pkgs.nix
+    pkgs.defaultbrowser
   ];
 
   fonts.packages = [
@@ -109,6 +110,7 @@ in
   system.activationScripts.postUserActivation.text = ''
     # Following line should allow us to avoid a logout/login cycle
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    defaultbrowser browser;
   '';
   system.defaults = {
     NSGlobalDomain.AppleShowAllExtensions = true;
