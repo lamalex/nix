@@ -69,8 +69,12 @@
     enable = true;
     userEmail = "dev@launi.me";
     userName = "Alex Launi";
-    diff-so-fancy.enable = true;
     lfs.enable = true;
+    difftastic = {
+      enable = true;
+      enableAsDifftool = true;
+      background = "dark";
+    };
     extraConfig = {
       init = {
         defaultBranch = "main";

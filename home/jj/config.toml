@@ -7,3 +7,4 @@ email = "dev@launi.me"
 [ui]
 editor = "hx"
 diff-editor = ":builtin"
+diff.tool = ["difft", "--color=always", "$left", "$right"]
