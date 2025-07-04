@@ -12,6 +12,7 @@
     pkgs.tree
     pkgs.sd
     pkgs.dogdns
+    pkgs.devenv
     # ripgrep
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.beszel
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.talosctl
