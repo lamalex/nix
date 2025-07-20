@@ -5,13 +5,7 @@ in
 {
   users.users.alexlauni.home = "/Users/alexlauni";
 
-  nix = {
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      warn-dirty = false;
-    };
-    channel.enable = false;
-  };
+  nix.enable = false;
   system.stateVersion = 6;
 
   nixpkgs = {
