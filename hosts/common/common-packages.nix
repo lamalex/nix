@@ -2,7 +2,6 @@
 {
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = [
-    pkgs.arc-browser
     pkgs.ripgrep
     pkgs.gh
     pkgs.nixd

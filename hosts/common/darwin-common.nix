@@ -74,6 +74,7 @@ in
 
     casks = [
       #"nikitabobko/tap/aerospace"
+      "arc"
       "discord"
       "obsidian"
       "raycast"
