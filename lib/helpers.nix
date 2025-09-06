@@ -19,19 +19,7 @@
             home-manager.extraSpecialArgs = { inherit inputs; };
             home-manager.users.${username} = { imports = [ ./../home/${username}.nix ]; };
         }
-        inputs.nix-homebrew.darwinModules.nix-homebrew {
-          nix-homebrew = {
-            enable = true;
-            enableRosetta = false;
-            autoMigrate = true;
-            mutableTaps = true;
-            user = "${username}";
-            taps = with inputs; {
-              "homebrew/homebrew-core" = homebrew-core;
-              "homebrew/homebrew-cask" = homebrew-cask;
-            };
-          };
-        }
+
 
       ];
       # ] ++ lib.optionals (builtins.pathExists ./../hosts/darwin/${hostname}/default.nix) [

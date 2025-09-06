@@ -6,7 +6,7 @@ in
   users.users.alexlauni.home = "/Users/alexlauni";
 
   nix.enable = false;
-  system.stateVersion = 6;
+  system.stateVersion = 5;
 
   nixpkgs = {
     config.allowUnfree = true;
@@ -51,6 +51,11 @@ in
     # promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
   };
 
+  environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
+
+
+
+
   homebrew = {
     enable = true;
     onActivation = {
@@ -63,6 +68,7 @@ in
     taps = [
       "homebrew/core"
       "homebrew/cask"
+      "sst/tap"
     ];
 
     brews = [
@@ -70,6 +76,7 @@ in
       "podman"
       "podman-compose"
       "podman-tui"
+      "opencode"
     ];
 
     casks = [

@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  home.stateVersion = "23.11";
+  home.stateVersion = "24.11";
 
   xdg.configFile."ghostty/config".text = builtins.readFile ./ghostty/config;
   # list of programs
