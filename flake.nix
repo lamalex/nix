@@ -3,33 +3,27 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-
+    nix-darwin.url = "github:LnL7/nix-darwin";
     home-manager.url = "github:nix-community/home-manager";
+
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-
-
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     mac-app-util.url = "github:hraban/mac-app-util";
   };
 
-  outputs = { ... }@inputs:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, mac-app-util, ... }@inputs:
     with inputs;
     let
       inherit (self) outputs;
-      stateVersion = "24.11";
+      stateVersion = "24.11"; # Home-Manager stateVersion (string)
       libx = import ./lib { inherit inputs outputs stateVersion; };
     in {
       darwinConfigurations = {
         ferenginar = libx.mkDarwin { hostname = "ferenginar"; };
       };
-
-      defaults = { lib, config, name, ... }: {
-        imports = [
-          inputs.home-manager.nixosModules.home-manager
-        ];
-      };
+      # Home-Manager is enabled from mkDarwin via home-manager.darwinModules.home-manager
     };
 }
+

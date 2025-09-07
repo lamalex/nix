@@ -3,7 +3,10 @@ let
   inherit (inputs) nixpkgs;
 in
 {
-  users.users.alexlauni.home = "/Users/alexlauni";
+  users.users.alexlauni = {
+    home = "/Users/alexlauni";
+    shell = pkgs.fish;
+  };
 
   nix.enable = false;
   system.stateVersion = 5;
@@ -51,6 +54,8 @@ in
     # promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
   };
 
+  programs.fish.enable = true;
+
   environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
 
 
@@ -66,8 +71,6 @@ in
     global.autoUpdate = true;
 
     taps = [
-      "homebrew/core"
-      "homebrew/cask"
       "sst/tap"
     ];
 
@@ -110,11 +113,13 @@ in
   security.pam.services.sudo_local.touchIdAuth = true;
 
   # macOS configuration
-  system.activationScripts.postUserActivation.text = ''
-    # Following line should allow us to avoid a logout/login cycle
-    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-    defaultbrowser browser;
+  system.activationScripts.userTweaks.text = ''
+    # Apply settings without requiring logout/login
+    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
+    # Set default browser for the primary user (needs to run as that user)
+    su -l ${config.system.primaryUser} -c '${pkgs.defaultbrowser}/bin/defaultbrowser browser || true'
   '';
+
   system.defaults = {
     NSGlobalDomain.AppleShowAllExtensions = true;
     NSGlobalDomain.AppleShowScrollBars = "Always";

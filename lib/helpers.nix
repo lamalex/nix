@@ -9,6 +9,23 @@
     inputs.nix-darwin.lib.darwinSystem {
       specialArgs = { inherit system inputs username; };
       modules = [
+        inputs.nix-homebrew.darwinModules.nix-homebrew
+        {
+          nix-homebrew = {
+            enable = true;
+            user = username;
+            autoMigrate = true;
+            
+          };
+        }
+        {
+          system.stateVersion = 6;
+          system.primaryUser = username;
+          security.pam.services.sudo_local.touchIdAuth = true;
+          environment.systemPackages = with inputs.nixpkgs; [
+            inputs.nix-darwin.packages.${system}.darwin-rebuild
+          ];
+        }
         ../hosts/common/common-packages.nix
         ../hosts/common/darwin-common.nix
         customConf
@@ -17,13 +34,13 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = { inherit inputs; };
-            home-manager.users.${username} = { imports = [ ./../home/${username}.nix ]; };
+            home-manager.users.${username} = {
+              home.stateVersion = stateVersion;
+              imports = [ ./../home/${username}.nix ];
+            }; 
         }
 
 
       ];
-      # ] ++ lib.optionals (builtins.pathExists ./../hosts/darwin/${hostname}/default.nix) [
-      #     (import ./../hosts/darwin/${hostname}/default.nix)
-      #   ];
     };
 }

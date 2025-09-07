@@ -41,6 +41,7 @@
   programs.eza = {
     enable = true;
     enableZshIntegration = true;
+    enableFishIntegration = true;
     icons = "auto";
     git = true;
     extraOptions = [
@@ -54,6 +55,7 @@
     enable = true;
     enableBashIntegration = true;
     enableZshIntegration = true;
+    enableFishIntegration = true;
     tmux.enableShellIntegration = true;
     defaultOptions = [
       "--no-mouse"
@@ -100,6 +102,7 @@
     enable = true;
     enableZshIntegration = true;
     enableBashIntegration = true;
+    enableFishIntegration = true;
     settings = pkgs.lib.importTOML ./starship/starship.toml;
   };
 
@@ -112,6 +115,13 @@
     #initExtra = (builtins.readFile ../mac-dot-zshrc);
   };
 
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      cat = "${pkgs.bat}/bin/bat";
+    };
+  };
+
   programs.home-manager.enable = true;
   programs.nix-index.enable = true;
 
@@ -122,7 +132,12 @@
   programs.helix.enable = true;
   programs.helix.defaultEditor = true;
   
-  programs.zoxide.enable = true;
+  programs.zoxide = {
+    enable = true;
+    enableFishIntegration = true;
+    enableZshIntegration = true;
+    enableBashIntegration = true;
+  };
 
   programs.ssh = {
     enable = true;
