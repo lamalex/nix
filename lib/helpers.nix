@@ -19,7 +19,6 @@
           };
         }
         {
-          system.stateVersion = 6;
           system.primaryUser = username;
           security.pam.services.sudo_local.touchIdAuth = true;
           environment.systemPackages = with inputs.nixpkgs; [

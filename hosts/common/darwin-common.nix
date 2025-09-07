@@ -26,7 +26,6 @@ in
     # pkgs.comma
     # pkgs.just
     pkgs.lima
-    pkgs.nix
     pkgs.defaultbrowser
   ];
 
