@@ -83,7 +83,6 @@ in
 
     casks = [
       #"nikitabobko/tap/aerospace"
-      "arc"
       "discord"
       "obsidian"
       "raycast"
@@ -95,6 +94,7 @@ in
       "visual-studio-code"
       "ghostty"
       "podman-desktop"
+      "zen"
     ];
     masApps = {
       "Keynote" = 409183694;

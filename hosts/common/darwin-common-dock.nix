@@ -2,7 +2,7 @@
 {
   system.defaults.dock = {
     persistent-apps = [
-      "/Applications/Nix Apps/Arc.app"
+      "/Applications/Zen.app"
       "/Applications/Ghostty.app"
       "/Applications/Discord.app"
       "/Applications/Slack.app"

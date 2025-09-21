@@ -156,4 +156,8 @@
       };
     };
   };
+
+  programs.aerospace = {
+    enable = true;
+  };
 }
