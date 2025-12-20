@@ -1,48 +1,39 @@
-{ inputs, outputs, config, lib, hostname, system, username, pkgs, ... }:
-let
-  inherit (inputs) nixpkgs;
-in
+{ inputs, config, lib, system, username, pkgs, ... }:
 {
-  users.users.alexlauni = {
-    home = "/Users/alexlauni";
-    shell = pkgs.fish;
-  };
-
+  # Determinate Nix manages Nix configuration; nix-darwin should not.
   nix.enable = false;
   system.stateVersion = 5;
 
-  nixpkgs = {
-    config.allowUnfree = true;
-    hostPlatform = lib.mkDefault "${system}";
+  # Make the primary user explicit here (or in host-specific config)
+  system.primaryUser = username;
+
+  users.users.${username} = {
+    home = "/Users/${username}";
+    shell = pkgs.fish;
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   environment.systemPackages = with pkgs; [
-    ## unstable
-    # unstablePkgs.yt-dlp
-    # unstablePkgs.get_iplayer
-    # unstablePkgs.colmena
-
-    ## stable CLI
-    # pkgs.comma
-    # pkgs.just
-    pkgs.lima
-    pkgs.defaultbrowser
+    lima
+    defaultbrowser
   ];
 
-  fonts.packages = [
-    pkgs.nerd-fonts.fira-code
-    pkgs.nerd-fonts.fira-mono
-    pkgs.nerd-fonts.hack
-    pkgs.nerd-fonts.jetbrains-mono
-    pkgs.nerd-fonts._0xproto
-    pkgs.nerd-fonts.droid-sans-mono
+  fonts.packages = with pkgs; [
+    nerd-fonts.fira-code
+    nerd-fonts.fira-mono
+    nerd-fonts.hack
+    nerd-fonts.jetbrains-mono
+    nerd-fonts._0xproto
+    nerd-fonts.droid-sans-mono
   ];
 
-  nix.registry = {
-    u.to = {
-      type = "path";
-      path = inputs.nixpkgs;
-    };
+  # NOTE: With nix.enable = false, nix-darwin may not be the authority for Nix config.
+  # If you find this registry isn't taking effect, move it to user-level (Home Manager)
+  # or your Determinate configuration.
+  nix.registry.u.to = {
+    type = "path";
+    path = inputs.nixpkgs;
   };
 
   programs.nix-index.enable = true;
@@ -50,15 +41,11 @@ in
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    # promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
   };
 
   programs.fish.enable = true;
 
   environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
-
-
-
 
   homebrew = {
     enable = true;
@@ -74,15 +61,13 @@ in
     ];
 
     brews = [
-  		"mas"
+      "mas"
       "podman"
       "podman-compose"
       "podman-tui"
-      "opencode"
     ];
 
     casks = [
-      #"nikitabobko/tap/aerospace"
       "discord"
       "obsidian"
       "raycast"
@@ -90,12 +75,12 @@ in
       "spotify"
       "1password"
       "1password-cli"
-      # "warp"
       "visual-studio-code"
       "ghostty"
       "podman-desktop"
       "zen"
     ];
+
     masApps = {
       "Keynote" = 409183694;
       "Numbers" = 409203825;
@@ -104,18 +89,13 @@ in
     };
   };
 
-  # Keyboard
   system.keyboard.enableKeyMapping = true;
   system.keyboard.remapCapsLockToEscape = true;
 
-  # Add ability to used TouchID for sudo authentication
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # macOS configuration
   system.activationScripts.userTweaks.text = ''
-    # Apply settings without requiring logout/login
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
-    # Set default browser for the primary user (needs to run as that user)
     su -l ${config.system.primaryUser} -c '${pkgs.defaultbrowser}/bin/defaultbrowser browser || true'
   '';
 
@@ -134,80 +114,293 @@ in
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
     NSGlobalDomain.NSWindowShouldDragOnGesture = true;
     NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
-    LaunchServices.LSQuarantine = false; # disables "Are you sure?" for new apps
+    LaunchServices.LSQuarantine = false;
     loginwindow.GuestEnabled = false;
     finder.FXPreferredViewStyle = "clmv";
   };
 
   system.defaults.CustomUserPreferences = {
-      "com.apple.finder" = {
-        ShowExternalHardDrivesOnDesktop = true;
-        ShowHardDrivesOnDesktop = false;
-        ShowMountedServersOnDesktop = false;
-        ShowRemovableMediaOnDesktop = true;
-        _FXSortFoldersFirst = true;
-        # When performing a search, search the current folder by default
-        FXDefaultSearchScope = "SCcf";
-        DisableAllAnimations = true;
-        NewWindowTarget = "PfDe";
-        NewWindowTargetPath = "file://$\{HOME\}/Desktop/";
-        AppleShowAllExtensions = true;
-        FXEnableExtensionChangeWarning = false;
-        ShowStatusBar = true;
-        ShowPathbar = true;
-        WarnOnEmptyTrash = false;
-      };
-      "com.apple.desktopservices" = {
-        # Avoid creating .DS_Store files on network or USB volumes
-        DSDontWriteNetworkStores = true;
-        DSDontWriteUSBStores = true;
-      };
-      "com.apple.dock" = {
-        autohide = true;
-        launchanim = false;
-        static-only = false;
-        show-recents = false;
-        show-process-indicators = true;
-        orientation = "bottom";
-        tilesize = 55;
-        minimize-to-application = true;
-        mineffect = "scale";
-        enable-window-tool = false;
-      };
-      "com.apple.ActivityMonitor" = {
-        OpenMainWindow = true;
-        IconType = 5;
-        SortColumn = "CPUUsage";
-        SortDirection = 0;
-      };
-      "com.apple.Safari" = {
-        # Privacy: don’t send search queries to Apple
-        UniversalSearchEnabled = true;
-        SuppressSearchSuggestions = true;
-      };
-      "com.apple.AdLib" = {
-        allowApplePersonalizedAdvertising = false;
-      };
-      "com.apple.SoftwareUpdate" = {
-        AutomaticCheckEnabled = true;
-        # Check for software updates daily, not just once per week
-        ScheduleFrequency = 1;
-        # Download newly available updates in background
-        AutomaticDownload = 1;
-        # Install System data files & security updates
-        CriticalUpdateInstall = 1;
-      };
-      "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
-      # Prevent Photos from opening automatically when devices are plugged in
-      "com.apple.ImageCapture".disableHotPlug = true;
-      # Turn on app auto-update
-      "com.apple.commerce".AutoUpdate = true;
-      "com.googlecode.iterm2".PromptOnQuit = false;
-      "com.google.Chrome" = {
-        AppleEnableSwipeNavigateWithScrolls = true;
-        DisablePrintPreview = true;
-        PMPrintingExpandedStateForPrint2 = true;
-      };
-  };
+    "com.apple.finder" = {
+      ShowExternalHardDrivesOnDesktop = true;
+      ShowHardDrivesOnDesktop = false;
+      ShowMountedServersOnDesktop = false;
+      ShowRemovableMediaOnDesktop = true;
+      _FXSortFoldersFirst = true;
+      FXDefaultSearchScope = "SCcf";
+      DisableAllAnimations = true;
+      NewWindowTarget = "PfDe";
+      NewWindowTargetPath = "file://$\{HOME\}/Desktop/";
+      AppleShowAllExtensions = true;
+      FXEnableExtensionChangeWarning = false;
+      ShowStatusBar = true;
+      ShowPathbar = true;
+      WarnOnEmptyTrash = false;
+    };
 
+    "com.apple.desktopservices" = {
+      DSDontWriteNetworkStores = true;
+      DSDontWriteUSBStores = true;
+    };
+
+    "com.apple.dock" = {
+      autohide = true;
+      launchanim = false;
+      static-only = false;
+      show-recents = false;
+      show-process-indicators = true;
+      orientation = "bottom";
+      tilesize = 55;
+      minimize-to-application = true;
+      mineffect = "scale";
+      enable-window-tool = false;
+    };
+
+    "com.apple.ActivityMonitor" = {
+      OpenMainWindow = true;
+      IconType = 5;
+      SortColumn = "CPUUsage";
+      SortDirection = 0;
+    };
+
+    "com.apple.Safari" = {
+      UniversalSearchEnabled = true;
+      SuppressSearchSuggestions = true;
+    };
+
+    "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
+
+    "com.apple.SoftwareUpdate" = {
+      AutomaticCheckEnabled = true;
+      ScheduleFrequency = 1;
+      AutomaticDownload = 1;
+      CriticalUpdateInstall = 1;
+    };
+
+    "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
+    "com.apple.ImageCapture".disableHotPlug = true;
+    "com.apple.commerce".AutoUpdate = true;
+
+    "com.googlecode.iterm2".PromptOnQuit = false;
+
+    "com.google.Chrome" = {
+      AppleEnableSwipeNavigateWithScrolls = true;
+      DisablePrintPreview = true;
+      PMPrintingExpandedStateForPrint2 = true;
+    };
+  };
 }
+
+
+# { inputs, outputs, config, lib, hostname, system, username, pkgs, ... }:
+# let
+#   inherit (inputs) nixpkgs;
+# in
+# {
+#   users.users.alexlauni = {
+#     home = "/Users/alexlauni";
+#     shell = pkgs.fish;
+#   };
+
+#   nix.enable = false;
+#   system.stateVersion = 5;
+
+#   nixpkgs = {
+#     config.allowUnfree = true;
+#     hostPlatform = lib.mkDefault "${system}";
+#   };
+
+#   environment.systemPackages = with pkgs; [
+#     ## unstable
+#     # unstablePkgs.yt-dlp
+#     # unstablePkgs.get_iplayer
+#     # unstablePkgs.colmena
+
+#     ## stable CLI
+#     # pkgs.comma
+#     # pkgs.just
+#     pkgs.lima
+#     pkgs.defaultbrowser
+#   ];
+
+#   fonts.packages = [
+#     pkgs.nerd-fonts.fira-code
+#     pkgs.nerd-fonts.fira-mono
+#     pkgs.nerd-fonts.hack
+#     pkgs.nerd-fonts.jetbrains-mono
+#     pkgs.nerd-fonts._0xproto
+#     pkgs.nerd-fonts.droid-sans-mono
+#   ];
+
+#   nix.registry = {
+#     u.to = {
+#       type = "path";
+#       path = inputs.nixpkgs;
+#     };
+#   };
+
+#   programs.nix-index.enable = true;
+
+#   programs.zsh = {
+#     enable = true;
+#     enableCompletion = true;
+#     # promptInit = builtins.readFile ./../../data/mac-dot-zshrc;
+#   };
+
+#   programs.fish.enable = true;
+
+#   environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
+
+
+
+
+#   homebrew = {
+#     enable = true;
+#     onActivation = {
+#       cleanup = "zap";
+#       autoUpdate = true;
+#       upgrade = true;
+#     };
+#     global.autoUpdate = true;
+
+#     taps = [
+#       "sst/tap"
+#     ];
+
+#     brews = [
+#   		"mas"
+#       "podman"
+#       "podman-compose"
+#       "podman-tui"
+#       "opencode"
+#     ];
+
+#     casks = [
+#       #"nikitabobko/tap/aerospace"
+#       "discord"
+#       "obsidian"
+#       "raycast"
+#       "slack"
+#       "spotify"
+#       "1password"
+#       "1password-cli"
+#       # "warp"
+#       "visual-studio-code"
+#       "ghostty"
+#       "podman-desktop"
+#       "zen"
+#     ];
+#     masApps = {
+#       "Keynote" = 409183694;
+#       "Numbers" = 409203825;
+#       "Pages" = 409201541;
+#       "Teams" = 6746640556;
+#     };
+#   };
+
+#   # Keyboard
+#   system.keyboard.enableKeyMapping = true;
+#   system.keyboard.remapCapsLockToEscape = true;
+
+#   # Add ability to used TouchID for sudo authentication
+#   security.pam.services.sudo_local.touchIdAuth = true;
+
+#   # macOS configuration
+#   system.activationScripts.userTweaks.text = ''
+#     # Apply settings without requiring logout/login
+#     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
+#     # Set default browser for the primary user (needs to run as that user)
+#     su -l ${config.system.primaryUser} -c '${pkgs.defaultbrowser}/bin/defaultbrowser browser || true'
+#   '';
+
+#   system.defaults = {
+#     NSGlobalDomain.AppleShowAllExtensions = true;
+#     NSGlobalDomain.AppleShowScrollBars = "Always";
+#     NSGlobalDomain.NSUseAnimatedFocusRing = false;
+#     NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
+#     NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
+#     NSGlobalDomain.PMPrintingExpandedStateForPrint = true;
+#     NSGlobalDomain.PMPrintingExpandedStateForPrint2 = true;
+#     NSGlobalDomain.NSDocumentSaveNewDocumentsToCloud = false;
+#     NSGlobalDomain.ApplePressAndHoldEnabled = false;
+#     NSGlobalDomain.InitialKeyRepeat = 25;
+#     NSGlobalDomain.KeyRepeat = 2;
+#     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
+#     NSGlobalDomain.NSWindowShouldDragOnGesture = true;
+#     NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
+#     LaunchServices.LSQuarantine = false; # disables "Are you sure?" for new apps
+#     loginwindow.GuestEnabled = false;
+#     finder.FXPreferredViewStyle = "clmv";
+#   };
+
+#   system.defaults.CustomUserPreferences = {
+#       "com.apple.finder" = {
+#         ShowExternalHardDrivesOnDesktop = true;
+#         ShowHardDrivesOnDesktop = false;
+#         ShowMountedServersOnDesktop = false;
+#         ShowRemovableMediaOnDesktop = true;
+#         _FXSortFoldersFirst = true;
+#         # When performing a search, search the current folder by default
+#         FXDefaultSearchScope = "SCcf";
+#         DisableAllAnimations = true;
+#         NewWindowTarget = "PfDe";
+#         NewWindowTargetPath = "file://$\{HOME\}/Desktop/";
+#         AppleShowAllExtensions = true;
+#         FXEnableExtensionChangeWarning = false;
+#         ShowStatusBar = true;
+#         ShowPathbar = true;
+#         WarnOnEmptyTrash = false;
+#       };
+#       "com.apple.desktopservices" = {
+#         # Avoid creating .DS_Store files on network or USB volumes
+#         DSDontWriteNetworkStores = true;
+#         DSDontWriteUSBStores = true;
+#       };
+#       "com.apple.dock" = {
+#         autohide = true;
+#         launchanim = false;
+#         static-only = false;
+#         show-recents = false;
+#         show-process-indicators = true;
+#         orientation = "bottom";
+#         tilesize = 55;
+#         minimize-to-application = true;
+#         mineffect = "scale";
+#         enable-window-tool = false;
+#       };
+#       "com.apple.ActivityMonitor" = {
+#         OpenMainWindow = true;
+#         IconType = 5;
+#         SortColumn = "CPUUsage";
+#         SortDirection = 0;
+#       };
+#       "com.apple.Safari" = {
+#         # Privacy: don’t send search queries to Apple
+#         UniversalSearchEnabled = true;
+#         SuppressSearchSuggestions = true;
+#       };
+#       "com.apple.AdLib" = {
+#         allowApplePersonalizedAdvertising = false;
+#       };
+#       "com.apple.SoftwareUpdate" = {
+#         AutomaticCheckEnabled = true;
+#         # Check for software updates daily, not just once per week
+#         ScheduleFrequency = 1;
+#         # Download newly available updates in background
+#         AutomaticDownload = 1;
+#         # Install System data files & security updates
+#         CriticalUpdateInstall = 1;
+#       };
+#       "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
+#       # Prevent Photos from opening automatically when devices are plugged in
+#       "com.apple.ImageCapture".disableHotPlug = true;
+#       # Turn on app auto-update
+#       "com.apple.commerce".AutoUpdate = true;
+#       "com.googlecode.iterm2".PromptOnQuit = false;
+#       "com.google.Chrome" = {
+#         AppleEnableSwipeNavigateWithScrolls = true;
+#         DisablePrintPreview = true;
+#         PMPrintingExpandedStateForPrint2 = true;
+#       };
+#   };
+
+# }

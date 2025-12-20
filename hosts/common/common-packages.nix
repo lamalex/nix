@@ -6,13 +6,14 @@
     pkgs.gh
     pkgs.nixd
     pkgs.uv
-    pkgs.du-dust
+    pkgs.dust
     pkgs.uutils-coreutils
     pkgs.tree
     pkgs.sd
     pkgs.dogdns
     pkgs.devenv
     pkgs.pandoc
+    pkgs.opencode
     # ripgrep
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.beszel
     # nixpkgs-unstable.legacyPackages.${pkgs.system}.talosctl
