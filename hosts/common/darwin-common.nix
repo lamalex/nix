@@ -76,7 +76,6 @@
       "1password"
       "1password-cli"
       "visual-studio-code"
-      "ghostty"
       "podman-desktop"
       "zen"
     ];
@@ -93,6 +92,9 @@
   system.keyboard.remapCapsLockToEscape = true;
 
   security.pam.services.sudo_local.touchIdAuth = true;
+
+  # Enable SSH daemon
+  services.openssh.enable = true;
 
   system.activationScripts.userTweaks.text = ''
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true

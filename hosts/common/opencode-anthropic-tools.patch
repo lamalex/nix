@@ -1,0 +1,64 @@
+--- a/packages/opencode/src/provider/provider.ts
++++ b/packages/opencode/src/provider/provider.ts
+@@ -920,23 +920,53 @@
+       options["fetch"] = async (input: any, init?: BunFetchRequestInit) => {
+         // Preserve custom fetch if it exists, wrap it with timeout logic
+         const fetchFn = customFetch ?? fetch
+-        const opts = init ?? {}
+-
++        const opts: any = { ...init }
+         if (options["timeout"] !== undefined && options["timeout"] !== null) {
+           const signals: AbortSignal[] = []
+           if (opts.signal) signals.push(opts.signal)
+           if (options["timeout"] !== false) signals.push(AbortSignal.timeout(options["timeout"]))
+-
+           const combined = signals.length > 1 ? AbortSignal.any(signals) : signals[0]
+-
+           opts.signal = combined
+         }
+-
+-        return fetchFn(input, {
++        // Transform tool names for Anthropic OAuth compatibility
++        if (model.api.npm === "@ai-sdk/anthropic") {
++          const TOOL_PREFIX = "oc_";
++          let body = opts.body;
++          if (body && typeof body === "string") {
++            try {
++              const parsed = JSON.parse(body);
++              if (parsed.tools && Array.isArray(parsed.tools)) {
++                parsed.tools = parsed.tools.map((tool: any) => ({
++                  ...tool,
++                  name: tool.name ? TOOL_PREFIX + tool.name : tool.name,
++                }));
++                opts.body = JSON.stringify(parsed);
++              }
++            } catch (e) {}
++          }
++        }
++        const response = await fetchFn(input, {
+           ...opts,
+           // @ts-ignore see here: https://github.com/oven-sh/bun/issues/16682
+           timeout: false,
+-        })
++        });
++        // Transform response for Anthropic to strip tool name prefix
++        if (model.api.npm === "@ai-sdk/anthropic" && response.body) {
++          const reader = response.body.getReader();
++          const decoder = new TextDecoder();
++          const encoder = new TextEncoder();
++          const stream = new ReadableStream({
++            async pull(controller) {
++              const { done, value } = await reader.read();
++              if (done) { controller.close(); return; }
++              let text = decoder.decode(value, { stream: true });
++              text = text.replace(/"name":\s*"oc_([^"]+)"/g, '"name": "$1"');
++              controller.enqueue(encoder.encode(text));
++            },
++          });
++          return new Response(stream, { status: response.status, statusText: response.statusText, headers: response.headers });
++        }
++        return response;
+       }
+ 
+       // Special case: google-vertex-anthropic uses a subpath import
+
