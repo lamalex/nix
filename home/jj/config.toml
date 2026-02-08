@@ -8,3 +8,6 @@ email = "dev@launi.me"
 editor = "hx"
 diff-editor = ":builtin"
 diff-formatter = ["difft", "--color=always", "$left", "$right"]
+
+[aliases]
+tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@"]

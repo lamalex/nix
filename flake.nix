@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
     nix-darwin = {
       url = "https://flakehub.com/f/nix-darwin/nix-darwin/0.1";
@@ -20,7 +21,7 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/0.1";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, nix-homebrew, mac-app-util, ... }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-master, nix-darwin, home-manager, nix-homebrew, mac-app-util, ... }:
     let
       username = "alexlauni";
       system = "aarch64-darwin";

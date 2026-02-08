@@ -1,13 +1,13 @@
-{ pkgs, ... }:
+{ pkgs, inputs, system, ... }:
 let
-  opencodePatched = pkgs.opencode.overrideAttrs (oldAttrs: {
-    patches = (oldAttrs.patches or []) ++ [
-      ./opencode-anthropic-tools.patch
-    ];
-  });
+  pkgsMaster = import inputs.nixpkgs-master {
+    inherit system;
+    config.allowUnfree = true;
+  };
 in
 {
   nixpkgs.config.allowUnfree = true;
+
   environment.systemPackages = [
     pkgs.ripgrep
     pkgs.gh
@@ -17,11 +17,10 @@ in
     pkgs.uutils-coreutils
     pkgs.tree
     pkgs.sd
-    pkgs.devenv
     pkgs.pandoc
-    opencodePatched
     pkgs.ghostty-bin
     pkgs.bottom
-    pkgs.google-chrome
+    pkgsMaster.opencode
   ];
 }
+

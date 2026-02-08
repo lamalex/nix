@@ -69,6 +69,7 @@
 
     casks = [
       "discord"
+      "google-chrome"
       "obsidian"
       "raycast"
       "slack"
@@ -77,7 +78,6 @@
       "1password-cli"
       "visual-studio-code"
       "podman-desktop"
-      "zen"
     ];
 
     masApps = {
@@ -93,8 +93,34 @@
 
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Enable SSH daemon
-  services.openssh.enable = true;
+  # Enable SSH daemon with security settings
+  services.openssh = {
+    enable = true;
+    # Create a more secure SSH configuration by overriding the default config
+    extraConfig = ''
+      # Security settings
+      PasswordAuthentication no
+      PermitRootLogin no
+      PubkeyAuthentication yes
+      AuthorizedKeysFile .ssh/authorized_keys
+      
+      # Additional security measures
+      MaxAuthTries 3
+      ClientAliveInterval 300
+      ClientAliveCountMax 2
+      AllowUsers ${username}
+      
+      # Disable unused authentication methods
+      ChallengeResponseAuthentication no
+      KerberosAuthentication no
+      GSSAPIAuthentication no
+      
+      # Modern cryptography
+      KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+    '';
+  };
 
   system.activationScripts.userTweaks.text = ''
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
@@ -289,7 +315,6 @@
 #       "visual-studio-code"
 #       "ghostty"
 #       "podman-desktop"
-#       "zen"
 #     ];
 #     masApps = {
 #       "Keynote" = 409183694;
