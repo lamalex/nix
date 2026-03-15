@@ -21,6 +21,7 @@ in
     pkgs.ghostty-bin
     pkgs.bottom
     pkgsMaster.opencode
+    pkgs.container
   ];
 }
 

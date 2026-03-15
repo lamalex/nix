@@ -26,6 +26,17 @@
       username = "alexlauni";
       system = "aarch64-darwin";
       stateVersion = "24.11";
+
+      # Overlay to update container to 0.10.0
+      containerOverlay = final: prev: {
+        container = prev.container.overrideAttrs (oldAttrs: rec {
+          version = "0.10.0";
+          src = final.fetchurl {
+            url = "https://github.com/apple/container/releases/download/${version}/container-${version}-installer-signed.pkg";
+            hash = "sha256-xIHONVUk0DbDzdrH/SgeMXlNQGkL+aIfcy7z12+p/gg=";
+          };
+        });
+      };
     in
     {
       darwinConfigurations.ferenginar = nix-darwin.lib.darwinSystem {
@@ -39,6 +50,7 @@
           # Determinate compatibility: nix-darwin must NOT manage Nix.
           ({ ... }: {
             nix.enable = false;
+            nixpkgs.overlays = [ containerOverlay ];
           })
 
           # Common macOS / nix-darwin settings

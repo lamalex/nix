@@ -62,9 +62,6 @@
 
     brews = [
       "mas"
-      "podman"
-      "podman-compose"
-      "podman-tui"
     ];
 
     casks = [
@@ -76,8 +73,8 @@
       "spotify"
       "1password"
       "1password-cli"
+      "tailscale"
       "visual-studio-code"
-      "podman-desktop"
     ];
 
     masApps = {
@@ -93,34 +90,9 @@
 
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Enable SSH daemon with security settings
-  services.openssh = {
-    enable = true;
-    # Create a more secure SSH configuration by overriding the default config
-    extraConfig = ''
-      # Security settings
-      PasswordAuthentication no
-      PermitRootLogin no
-      PubkeyAuthentication yes
-      AuthorizedKeysFile .ssh/authorized_keys
-      
-      # Additional security measures
-      MaxAuthTries 3
-      ClientAliveInterval 300
-      ClientAliveCountMax 2
-      AllowUsers ${username}
-      
-      # Disable unused authentication methods
-      ChallengeResponseAuthentication no
-      KerberosAuthentication no
-      GSSAPIAuthentication no
-      
-      # Modern cryptography
-      KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
-      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
-    '';
-  };
+  # SSH is now handled by Tailscale SSH (tailscale up --ssh)
+  # This provides secure remote access only over the Tailscale network
+  # No public-facing SSH daemon is needed
 
   system.activationScripts.userTweaks.text = ''
     /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
@@ -296,9 +268,6 @@
 
 #     brews = [
 #   		"mas"
-#       "podman"
-#       "podman-compose"
-#       "podman-tui"
 #       "opencode"
 #     ];
 
@@ -314,7 +283,6 @@
 #       # "warp"
 #       "visual-studio-code"
 #       "ghostty"
-#       "podman-desktop"
 #     ];
 #     masApps = {
 #       "Keynote" = 409183694;
