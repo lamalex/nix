@@ -51,6 +51,13 @@
     enableBashIntegration = true;
   };
 
+  programs.atuin = {
+    enable = true;
+    enableBashIntegration = true;
+    enableZshIntegration = true;
+    enableFishIntegration = true;
+  };
+
   programs.fzf = {
     enable = true;
     enableBashIntegration = true;
