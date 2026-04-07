@@ -16,12 +16,9 @@
     };
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    mac-app-util.url = "github:hraban/mac-app-util";
-
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/0.1";
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-master, nix-darwin, home-manager, nix-homebrew, mac-app-util, ... }:
+  outputs = inputs@{ nix-darwin, home-manager, nix-homebrew, ... }:
     let
       username = "alexlauni";
       system = "aarch64-darwin";
@@ -37,9 +34,8 @@
           };
         });
       };
-    in
-    {
-      darwinConfigurations.ferenginar = nix-darwin.lib.darwinSystem {
+
+      mkDarwinConfiguration = hostPath: nix-darwin.lib.darwinSystem {
         inherit system;
 
         specialArgs = {
@@ -61,11 +57,8 @@
           nix-homebrew.darwinModules.nix-homebrew
           ./hosts/common/nix-homebrew.nix
 
-          # Optional (only if you actually use it)
-          # mac-app-util.darwinModules.default
-
           # Host-specific overrides
-          ./hosts/darwin/ferenginar/default.nix
+          hostPath
 
           # Home Manager as a nix-darwin module
           home-manager.darwinModules.home-manager
@@ -83,5 +76,9 @@
           })
         ];
       };
+    in
+    {
+      darwinConfigurations.ferenginar = mkDarwinConfiguration ./hosts/darwin/ferenginar/default.nix;
+      darwinConfigurations.andoria = mkDarwinConfiguration ./hosts/darwin/andoria/default.nix;
     };
 }

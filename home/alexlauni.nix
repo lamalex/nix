@@ -119,9 +119,14 @@
     settings = pkgs.lib.importTOML ./jj/config.toml;
   };
 
+  programs.jjui = {
+    enable = true;
+  };
+
   programs.git = {
     enable = true;
     lfs.enable = true;
+    signing.format = "openpgp";
 
     settings = {
       user = {
@@ -162,15 +167,6 @@
         hostname = "ssh.github.com";
         port = 443;
         user = "git";
-      };
-
-      # Example: only for a known dev box
-      "my-dev-box" = {
-        hostname = "10.0.0.50";
-        user = "root";
-        extraOptions = {
-          StrictHostKeyChecking = "accept-new";
-        };
       };
 
       "*" = {
