@@ -129,10 +129,6 @@
     signing.format = "openpgp";
 
     settings = {
-      user = {
-        email = "dev@launi.me";
-        name = "Alex Launi";
-      };
       init.defaultBranch = "main";
       merge = {
         conflictStyle = "diff3";

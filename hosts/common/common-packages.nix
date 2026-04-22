@@ -22,6 +22,7 @@ in
     pkgs.bottom
     pkgsMaster.opencode
     pkgs.container
+    pkgs.glow
   ];
 }
 

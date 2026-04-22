@@ -54,7 +54,6 @@
     casks = [
       "discord"
       "google-chrome"
-      "obsidian"
       "raycast"
       "slack"
       "spotify"
@@ -63,12 +62,6 @@
       "visual-studio-code"
     ];
 
-    masApps = {
-      "Keynote" = 409183694;
-      "Numbers" = 409203825;
-      "Pages" = 409201541;
-      "Teams" = 6746640556;
-    };
   };
 
   system.keyboard.enableKeyMapping = true;
