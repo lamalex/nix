@@ -47,10 +47,6 @@
       "sst/tap"
     ];
 
-    brews = [
-      "mas"
-    ];
-
     casks = [
       "discord"
       "google-chrome"

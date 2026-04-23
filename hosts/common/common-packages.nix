@@ -23,6 +23,7 @@ in
     pkgsMaster.opencode
     pkgs.container
     pkgs.glow
+    pkgs.ouch
   ];
 }
 

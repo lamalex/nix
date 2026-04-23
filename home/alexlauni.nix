@@ -147,6 +147,14 @@
     options.background = "dark";
   };
 
+  programs.yazi = {
+    enable = true;
+    shellWrapperName = "yy";
+  };
+
+  targets.darwin.copyApps.enable = true;
+  targets.darwin.linkApps.enable = false;
+
   # Indexing / completion
   programs.home-manager.enable = true;
 
