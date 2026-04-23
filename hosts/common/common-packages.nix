@@ -11,6 +11,7 @@ in
   environment.systemPackages = [
     pkgs.ripgrep
     pkgs.gh
+    pkgs.fh
     pkgs.nixd
     pkgs.uv
     pkgs.dust
@@ -26,4 +27,3 @@ in
     pkgs.ouch
   ];
 }
-
