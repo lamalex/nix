@@ -22,7 +22,11 @@ in
     pkgs.ghostty-bin
     pkgs.bottom
     pkgsMaster.opencode
+    # Keep both until Apple container can cover Docker-style workflows.
     pkgs.container
+    pkgs.podman
+    pkgs.podman-compose
+    pkgs.podman-desktop
     pkgs.glow
     pkgs.ouch
   ];

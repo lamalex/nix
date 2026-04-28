@@ -1,33 +1,47 @@
 { pkgs, lib, ... }:
+let
+  shellAliases = {
+    cat = "${pkgs.bat}/bin/bat";
+    docker = "podman";
+    docker-compose = "podman-compose";
+  };
+in
 {
   # Files
   xdg.configFile."ghostty/config".text = builtins.readFile ./ghostty/config;
 
   # Core CLI / shell tools
-  programs.bash.enable = true;
+  programs.bash = {
+    enable = true;
+    shellAliases = shellAliases;
+  };
 
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
-    shellAliases = {
-      cat = "${pkgs.bat}/bin/bat";
-    };
+    shellAliases = shellAliases;
     initContent = ''
       # Copy bat completions to cat alias
       compdef cat=bat
+
+      # Reuse Podman completions for Docker compatibility aliases.
+      compdef docker=podman
+      compdef docker-compose=podman-compose
     '';
     # initContent = builtins.readFile ../mac-dot-zshrc;
   };
 
   programs.fish = {
     enable = true;
-    shellAliases = {
-      cat = "${pkgs.bat}/bin/bat";
-    };
+    shellAliases = shellAliases;
     interactiveShellInit = ''
       # Copy bat completions to cat alias
       complete -c cat -w bat
+
+      # Reuse Podman completions for Docker compatibility aliases.
+      complete -c docker -w podman
+      complete -c docker-compose -w podman-compose
     '';
   };
 
