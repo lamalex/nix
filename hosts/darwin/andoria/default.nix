@@ -13,6 +13,8 @@
   homebrew.masApps = lib.mkForce { };
 
   home-manager.users.${username}.programs = {
+    claude-code.enable = true;
+
     jujutsu.settings.user = {
       name = "Alex Launi";
       email = "alauni@actblue.com";
