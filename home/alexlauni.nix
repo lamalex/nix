@@ -2,8 +2,6 @@
 let
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
-    docker = "podman";
-    docker-compose = "podman-compose";
   };
 in
 {
@@ -24,10 +22,6 @@ in
     initContent = ''
       # Copy bat completions to cat alias
       compdef cat=bat
-
-      # Reuse Podman completions for Docker compatibility aliases.
-      compdef docker=podman
-      compdef docker-compose=podman-compose
     '';
     # initContent = builtins.readFile ../mac-dot-zshrc;
   };
@@ -38,10 +32,6 @@ in
     interactiveShellInit = ''
       # Copy bat completions to cat alias
       complete -c cat -w bat
-
-      # Reuse Podman completions for Docker compatibility aliases.
-      complete -c docker -w podman
-      complete -c docker-compose -w podman-compose
     '';
   };
 
