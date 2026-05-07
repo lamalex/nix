@@ -3,7 +3,12 @@ editor = "hx"
 [ui]
 editor = "hx"
 diff-editor = ":builtin"
-diff-formatter = ["difft", "--color=always", "$left", "$right"]
+diff-formatter = ":git"
+
+[[--scope]]
+--when.commands = ["diff", "show", "interdiff"]
+[--scope.ui]
+pager = ["hunk", "pager"]
 
 [aliases]
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@"]
