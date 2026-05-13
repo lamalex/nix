@@ -1,7 +1,11 @@
-{ lib, username, ... }:
+{ lib, pkgs, username, ... }:
 {
   imports = [
     ../../common/darwin-system-tweaks.nix
+  ];
+
+  environment.systemPackages = with pkgs; [
+    k9s
   ];
 
   networking.hostName = "andoria";
