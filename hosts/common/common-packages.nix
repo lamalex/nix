@@ -42,6 +42,8 @@ let
   hunkArtifact =
     hunkArtifacts.${pkgs.stdenv.hostPlatform.system}
       or (throw "Unsupported system for hunk: ${pkgs.stdenv.hostPlatform.system}");
+  merman = pkgs.callPackage ../../pkgs/merman { };
+
   hunk = pkgs.stdenvNoCC.mkDerivation {
     pname = "hunk";
     version = hunkVersion;
@@ -92,5 +94,7 @@ in
     pkgs.glow
     pkgs.ouch
     hunk
+    merman
+    pkgs.nix-direnv
   ];
 }
