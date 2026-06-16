@@ -43,10 +43,6 @@
     };
     global.autoUpdate = true;
 
-    taps = [
-      "sst/tap"
-    ];
-
     casks = [
       "discord"
       "ghostty"
