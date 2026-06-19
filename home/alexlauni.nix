@@ -146,7 +146,7 @@ in
     enable = true;
     git = {
       enable = true;
-      diffToolMode = true;
+      mode = "difftool";
     };
     options.background = "dark";
   };
@@ -170,17 +170,15 @@ in
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    settings = {
       "github.com" = {
-        hostname = "ssh.github.com";
-        port = 443;
-        user = "git";
+        HostName = "ssh.github.com";
+        Port = 443;
+        User = "git";
       };
 
       "*" = {
-        extraOptions = {
-          StrictHostKeyChecking = "yes";
-        };
+        StrictHostKeyChecking = "yes";
       };
     };
   };
