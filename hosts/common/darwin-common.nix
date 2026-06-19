@@ -49,6 +49,7 @@
 
     casks = [
       "discord"
+      "ghostty"
       "google-chrome"
       "raycast"
       "slack"

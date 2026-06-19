@@ -72,7 +72,6 @@ in
     pkgs.tree
     pkgs.sd
     pkgs.pandoc
-    pkgs.ghostty-bin
     pkgs.bottom
     pkgsMaster.opencode
     # Keep both until Apple container can cover Docker-style workflows.
