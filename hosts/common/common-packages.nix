@@ -5,6 +5,12 @@ let
     config.allowUnfree = true;
   };
 
+  upstreamOpencode = inputs.opencode.packages.${system}.opencode;
+  opencodeV2 = pkgs.runCommand "opencode-v2-${upstreamOpencode.version}" { } ''
+    mkdir -p $out/bin
+    ln -s ${upstreamOpencode}/bin/opencode $out/bin/opencode-v2
+  '';
+
   hunkVersion = "0.10.0";
   hunkArtifacts = {
     aarch64-darwin = {
@@ -74,6 +80,7 @@ in
     pkgs.pandoc
     pkgs.bottom
     pkgsMaster.opencode
+    opencodeV2
     # Keep both until Apple container can cover Docker-style workflows.
     pkgs.container
     pkgs.orbstack
