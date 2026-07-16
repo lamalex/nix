@@ -67,6 +67,7 @@ in
     enableBashIntegration = true;
     enableZshIntegration = true;
     enableFishIntegration = true;
+    historyWidget.command = "";
     tmux.enableShellIntegration = true;
     defaultOptions = [ "--no-mouse" ];
   };
