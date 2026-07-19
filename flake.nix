@@ -5,8 +5,8 @@
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
 
-    # OpenCode v1.18.2
-    opencode.url = "github:anomalyco/opencode/70b56a0a93d366889cae950379cc9d2537148fa2";
+    # OpenCode v2 branch
+    opencode.url = "github:anomalyco/opencode/c310ef82f4688225d06e84d682a1871f5b6a2600";
 
     nix-darwin = {
       url = "https://flakehub.com/f/nix-darwin/nix-darwin/0.1";
