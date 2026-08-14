@@ -1,12 +1,48 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, hostName, ... }:
 let
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
   };
+
+  # Per-host SSH identity keys. Each is a separate SSH Key item in 1Password
+  # named after the machine. 1Password syncs items to every device, so this
+  # gives per-host identity on GitHub (audit trail + per-machine revocation),
+  # not isolation — every key is reachable from every machine's agent.
+  # To add a host: generate its key in 1Password, paste the public key here,
+  # and upload it to GitHub (both as an authentication key and a signing key).
+  hostKeys = {
+    rubiconiii = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIATI6SmHL4hl4jN2vryj8ec//GxEDdvvFr45Kg+hUdBU";
+    # andoria = "ssh-ed25519 ...";
+    # ferenginar = "ssh-ed25519 ...";
+  };
+  thisHostKey =
+    hostKeys.${hostName}
+      or (builtins.throw "no SSH key defined for host '${hostName}' — add it to hostKeys in home/alexlauni.nix");
 in
 {
   # Files
   xdg.configFile."ghostty/config".text = builtins.readFile ./ghostty/config;
+
+  # GitHub's published SSH host keys (https://api.github.com/meta), pinned so
+  # StrictHostKeyChecking=yes works without trust-on-first-use. This file is
+  # nix-managed (read-only) — add other hosts here as needed.
+  home.file.".ssh/known_hosts".text = ''
+    github.com,[ssh.github.com]:443 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    github.com,[ssh.github.com]:443 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+    github.com,[ssh.github.com]:443 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+  '';
+
+  # Principals trusted for SSH commit-signature verification
+  # (git log --show-signature): every host key, under both emails.
+  home.file.".ssh/allowed_signers".text =
+    lib.concatStringsSep "\n" (lib.concatMap (key: [
+      "dev@launi.me ${key}"
+      "alauni@actblue.com ${key}"
+    ]) (lib.unique (builtins.attrValues hostKeys))) + "\n";
+
+  # This machine's own public key — referenced by IdentityFile in the ssh
+  # config so the host consistently uses its designated key from the agent.
+  home.file.".ssh/${hostName}.pub".text = "${thisHostKey}\n";
 
   # Core CLI / shell tools
   programs.bash = {
@@ -131,7 +167,13 @@ in
   programs.git = {
     enable = true;
     lfs.enable = true;
-    signing.format = "openpgp";
+
+    # Sign commits with this host's SSH key, stored in 1Password (TouchID)
+    signing = {
+      format = "ssh";
+      key = thisHostKey;
+      signByDefault = true;
+    };
 
     settings = {
       init.defaultBranch = "main";
@@ -140,6 +182,10 @@ in
         tool = "meld";
       };
       pull.rebase = true;
+      gpg.ssh = {
+        program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+        allowedSignersFile = "~/.ssh/allowed_signers";
+      };
     };
   };
 
@@ -176,12 +222,23 @@ in
         HostName = "ssh.github.com";
         Port = 443;
         User = "git";
+        # The agent offers every key in 1Password; pin this machine's own key
+        IdentityFile = "~/.ssh/${hostName}.pub";
+        IdentitiesOnly = "yes";
       };
 
       "*" = {
         StrictHostKeyChecking = "yes";
+        # Use 1Password's SSH agent (TouchID) instead of the macOS agent
+        IdentityAgent = ''"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'';
       };
     };
+  };
+
+  # Point SSH_AUTH_SOCK at 1Password's agent too, for tools that don't read
+  # ssh config (jj/libssh2, VS Code, ssh-add, ...)
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   };
 
   # macOS-only

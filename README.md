@@ -56,13 +56,18 @@ machine's host name, so there is nothing to register in `flake.nix`.
    }
    ```
 
-2. Track it in git (flakes only see tracked files):
+2. Generate an SSH key for the host as a new SSH Key item in 1Password,
+   add the public key to `hostKeys` in `home/alexlauni.nix` (the build fails
+   without it), and upload it to GitHub as both an authentication key and a
+   signing key.
+
+3. Track it in git (flakes only see tracked files):
 
    ```sh
    git add hosts/darwin/<name>
    ```
 
-3. Apply it:
+4. Apply it:
 
    ```sh
    sudo nix run --inputs-from . nix-darwin#darwin-rebuild -- switch --flake path:$PWD#<name>

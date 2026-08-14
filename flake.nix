@@ -81,7 +81,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs; };
+            home-manager.extraSpecialArgs = { inherit inputs hostName; };
 
             home-manager.users.${username} = {
               home.stateVersion = stateVersion;
