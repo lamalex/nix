@@ -74,11 +74,6 @@
       SortDirection = 0;
     };
 
-    "com.apple.Safari" = {
-      UniversalSearchEnabled = true;
-      SuppressSearchSuggestions = true;
-    };
-
     "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
 
     "com.apple.SoftwareUpdate" = {
