@@ -20,7 +20,10 @@
     NSGlobalDomain.PMPrintingExpandedStateForPrint = true;
     NSGlobalDomain.PMPrintingExpandedStateForPrint2 = true;
     NSGlobalDomain.NSDocumentSaveNewDocumentsToCloud = false;
-    NSGlobalDomain.ApplePressAndHoldEnabled = false;
+    # Hold a letter key -> accent menu (mutually exclusive with hold-to-repeat;
+    # setting false would enable key repeat instead)
+    NSGlobalDomain.ApplePressAndHoldEnabled = true;
+    # Repeat speed for keys without accents (arrows, delete, ...)
     NSGlobalDomain.InitialKeyRepeat = 25;
     NSGlobalDomain.KeyRepeat = 2;
     NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
@@ -99,6 +102,9 @@
     "com.apple.commerce".AutoUpdate = true;
 
     "com.googlecode.iterm2".PromptOnQuit = false;
+
+    # Hold-to-repeat in the terminal (overrides the global accent-menu setting)
+    "com.mitchellh.ghostty".ApplePressAndHoldEnabled = false;
 
     "com.google.Chrome" = {
       AppleEnableSwipeNavigateWithScrolls = true;
