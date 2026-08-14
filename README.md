@@ -39,5 +39,31 @@ Use one of the currently-defined hosts for `<host>`:
 
 - `ferenginar`
 - `andoria`
+- `rubiconiii`
 
 After the first switch, run the same `darwin-rebuild` command from the repo root whenever you want to apply changes.
+
+## Adding a new host
+
+Hosts are auto-discovered from `hosts/darwin/` — the directory name becomes the
+machine's host name, so there is nothing to register in `flake.nix`.
+
+1. Create `hosts/darwin/<name>/default.nix` that imports a profile:
+
+   ```nix
+   {
+     imports = [ ../../common/personal.nix ]; # or work.nix
+   }
+   ```
+
+2. Track it in git (flakes only see tracked files):
+
+   ```sh
+   git add hosts/darwin/<name>
+   ```
+
+3. Apply it:
+
+   ```sh
+   sudo nix run --inputs-from . nix-darwin#darwin-rebuild -- switch --flake path:$PWD#<name>
+   ```

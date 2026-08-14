@@ -83,6 +83,17 @@
       CriticalUpdateInstall = 1;
     };
 
+    # Disable Spotlight keyboard shortcuts:
+    #   64 = "Show Spotlight search" (Cmd+Space)
+    #   65 = "Show Finder search window" (Alt+Cmd+Space)
+    "com.apple.symbolichotkeys".AppleSymbolicHotKeys = {
+      "64".enabled = false;
+      "65".enabled = false;
+    };
+
+    # Bind Raycast launcher to Cmd+Space (49 = Space key code)
+    "com.raycast.macos".raycastGlobalHotkey = "Command-49";
+
     "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
     "com.apple.ImageCapture".disableHotPlug = true;
     "com.apple.commerce".AutoUpdate = true;

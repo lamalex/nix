@@ -185,7 +185,7 @@ in
   };
 
   # macOS-only
-  programs.aerospace = lib.mkIf pkgs.stdenv.isDarwin {
+  programs.aerospace = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
   };
 }

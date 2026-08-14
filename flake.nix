@@ -21,7 +21,7 @@
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  outputs = inputs@{ nix-darwin, home-manager, nix-homebrew, ... }:
+  outputs = inputs@{ nixpkgs, nix-darwin, home-manager, nix-homebrew, ... }:
     let
       username = "alexlauni";
       system = "aarch64-darwin";
@@ -38,7 +38,12 @@
         });
       };
 
-      mkDarwinConfiguration = hostPath: nix-darwin.lib.darwinSystem {
+      # Every directory under hosts/darwin is a host; its name becomes the host name.
+      darwinHosts = builtins.attrNames (
+        nixpkgs.lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./hosts/darwin)
+      );
+
+      mkDarwinConfiguration = hostName: nix-darwin.lib.darwinSystem {
         inherit system;
 
         specialArgs = {
@@ -50,18 +55,23 @@
           ({ ... }: {
             nix.enable = false;
             nixpkgs.overlays = [ containerOverlay ];
+
+            networking.hostName = hostName;
+            networking.localHostName = hostName;
+            networking.computerName = hostName;
           })
 
           # Common macOS / nix-darwin settings
           ./hosts/common/darwin-common.nix
           ./hosts/common/common-packages.nix
+          ./hosts/common/darwin-system-tweaks.nix
 
           # Homebrew
           nix-homebrew.darwinModules.nix-homebrew
           ./hosts/common/nix-homebrew.nix
 
           # Host-specific overrides
-          hostPath
+          ./hosts/darwin/${hostName}
 
           # Home Manager as a nix-darwin module
           home-manager.darwinModules.home-manager
@@ -82,7 +92,6 @@
       };
     in
     {
-      darwinConfigurations.ferenginar = mkDarwinConfiguration ./hosts/darwin/ferenginar/default.nix;
-      darwinConfigurations.andoria = mkDarwinConfiguration ./hosts/darwin/andoria/default.nix;
+      darwinConfigurations = nixpkgs.lib.genAttrs darwinHosts mkDarwinConfiguration;
     };
 }
