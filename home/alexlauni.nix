@@ -1,4 +1,4 @@
-{ pkgs, lib, hostName, ... }:
+{ pkgs, lib, hostName, inputs, ... }:
 let
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
@@ -233,6 +233,15 @@ in
         IdentityAgent = ''"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'';
       };
     };
+  };
+
+  # Pin `u` to this flake's nixpkgs. Lives at user level (~/.config/nix/
+  # registry.json) because nix-darwin's nix.registry is inert with
+  # nix.enable = false, and determinateNix.registry would hijack the global
+  # flake-registry (breaking bare `nixpkgs#` refs).
+  nix.registry.u.to = {
+    type = "path";
+    path = inputs.nixpkgs;
   };
 
   # Point SSH_AUTH_SOCK at 1Password's agent too, for tools that don't read

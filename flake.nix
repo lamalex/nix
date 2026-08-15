@@ -19,6 +19,10 @@
     };
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+
+    # Determinate Nix <-> nix-darwin integration: manages nix.enable = false,
+    # /etc/nix/nix.custom.conf and /etc/determinate/config.json
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
   outputs = inputs@{ nixpkgs, nix-darwin, home-manager, nix-homebrew, ... }:
@@ -51,9 +55,12 @@
         };
 
         modules = [
-          # Determinate compatibility: nix-darwin must NOT manage Nix.
+          # Determinate compatibility: this module disables nix-darwin's Nix
+          # management for us (sets nix.enable = false)
+          inputs.determinate.darwinModules.default
+
           ({ ... }: {
-            nix.enable = false;
+            determinateNix.enable = true;
             nixpkgs.overlays = [ containerOverlay ];
 
             networking.hostName = hostName;

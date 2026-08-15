@@ -1,4 +1,4 @@
-{ inputs, config, username, pkgs, ... }:
+{ inputs, config, username, pkgs, lib, ... }:
 {
   system.stateVersion = 5;
 
@@ -24,13 +24,28 @@
     nerd-fonts.droid-sans-mono
   ];
 
-  # NOTE: With nix.enable = false, nix-darwin may not be the authority for Nix config.
-  # If you find this registry isn't taking effect, move it to user-level (Home Manager)
-  # or your Determinate configuration.
-  nix.registry.u.to = {
-    type = "path";
-    path = inputs.nixpkgs;
+  # Custom Determinate Nix CLI settings, rendered to /etc/nix/nix.custom.conf
+  # by the determinate module (Determinate owns /etc/nix/nix.conf itself).
+  # NOTE: don't use determinateNix.registry — the module points the global
+  # flake-registry at the generated file, which would break bare `nixpkgs#`
+  # refs. The `u` pin lives in home/alexlauni.nix (user registry) instead.
+  determinateNix.customSettings = {
+    extra-substituters = [ "https://moonrepo.cachix.org" ];
+    extra-trusted-substituters = [ "https://moonrepo.cachix.org" ];
+    extra-trusted-public-keys = [ "moonrepo.cachix.org-1:n4zm4mkV1Eoqck4mQvAhJM28EQwFLU7kW4dEbtAXbD8=" ];
   };
+
+  # Reload Determinate's nix-daemon when the custom nix config changes, so new
+  # settings (substituters, ...) take effect without a manual kickstart.
+  # nix-darwin's built-in daemon reload lives in its nix module, which is
+  # disabled here (Determinate owns Nix). This runs in postActivation, before
+  # /run/current-system is repointed, so it still sees the previous generation.
+  system.activationScripts.postActivation.text = lib.mkAfter ''
+    if ! diff /etc/nix/nix.custom.conf /run/current-system/etc/nix/nix.custom.conf &> /dev/null; then
+      echo "reloading determinate nix-daemon (nix.custom.conf changed)..." >&2
+      launchctl kickstart -k system/systems.determinate.nix-daemon
+    fi
+  '';
 
   environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
 

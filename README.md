@@ -22,11 +22,11 @@ Personal macOS configuration built with `nix-darwin`, `home-manager`, and `nix-h
    pbcopy < ~/.ssh/id_ed25519_nex.pub
    ```
 
-4. Clone this repo into `~/.config/nix` and enter it:
+4. Clone this repo into `~/Code/nix` and enter it:
 
    ```sh
-   git clone <repo-url> ~/.config/nix
-   cd ~/.config/nix
+   git clone <repo-url> ~/Code/nix
+   cd ~/Code/nix
    ```
 
 5. Apply the host configuration:
