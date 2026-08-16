@@ -2,6 +2,7 @@
 { username, ... }:
 {
   homebrew.casks = [
+    "chatgpt"
     "tailscale-app"
   ];
 
