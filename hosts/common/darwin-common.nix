@@ -59,9 +59,7 @@
     global.autoUpdate = true;
 
     casks = [
-      "discord"
       "ghostty"
-      "google-chrome"
       "raycast"
       "slack"
       "spotify"

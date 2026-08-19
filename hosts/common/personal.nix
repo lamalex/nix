@@ -4,6 +4,8 @@
   homebrew.casks = [
     "chatgpt"
     "tailscale-app"
+    "google-chrome"
+    "discord"
   ];
 
   homebrew.brews = [
