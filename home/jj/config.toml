@@ -12,3 +12,6 @@ pager = ["hunk", "pager"]
 
 [aliases]
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@"]
+
+[templates]
+log = "builtin_log_compact_full_description"
