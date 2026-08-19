@@ -12,7 +12,7 @@ let
   # and upload it to GitHub (both as an authentication key and a signing key).
   hostKeys = {
     rubiconiii = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIATI6SmHL4hl4jN2vryj8ec//GxEDdvvFr45Kg+hUdBU";
-    # andoria = "ssh-ed25519 ...";
+    andoria = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIAAFThFqJMUPBTzhNAQ5XdVTWKEyoG9aiSZezfHxPFz";
     # ferenginar = "ssh-ed25519 ...";
   };
   thisHostKey =
