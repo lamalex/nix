@@ -1,4 +1,4 @@
-{ pkgs, lib, hostName, inputs, ... }:
+{ config, pkgs, lib, hostName, inputs, ... }:
 let
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
@@ -22,6 +22,13 @@ in
 {
   # Files
   xdg.configFile."ghostty/config".text = builtins.readFile ./ghostty/config;
+
+  home.file.".claude/CLAUDE.md" = lib.mkIf config.programs.claude-code.enable {
+    text = ''
+      Always use ASD-STE100 Simplified Technical English when responding or writing.
+      Use `jj` over `git` for all vcs operations, provided `jj` has been initialized in the active repository.
+    '';
+  };
 
   # GitHub's published SSH host keys (https://api.github.com/meta), pinned so
   # StrictHostKeyChecking=yes works without trust-on-first-use. This file is
