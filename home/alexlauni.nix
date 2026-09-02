@@ -1,5 +1,6 @@
 { config, pkgs, lib, hostName, inputs, ... }:
 let
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
   };
@@ -16,8 +17,11 @@ let
     # ferenginar = "ssh-ed25519 ...";
   };
   thisHostKey =
-    hostKeys.${hostName}
-      or (builtins.throw "no SSH key defined for host '${hostName}' — add it to hostKeys in home/alexlauni.nix");
+    if isDarwin then
+      hostKeys.${hostName}
+        or (builtins.throw "no SSH key defined for host '${hostName}' — add it to hostKeys in home/alexlauni.nix")
+    else
+      null;
 in
 {
   # Files
@@ -34,6 +38,7 @@ in
   # StrictHostKeyChecking=yes works without trust-on-first-use. This file is
   # nix-managed (read-only) — add other hosts here as needed.
   home.file.".ssh/known_hosts".text = ''
+    64.176.192.21,birdd-forge.tail66f312.ts.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOFw7/L/urUEL6urQth7SuAv1FY8RjJMkHeKLjlLK0X2
     github.com,[ssh.github.com]:443 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
     github.com,[ssh.github.com]:443 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
     github.com,[ssh.github.com]:443 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
@@ -49,7 +54,9 @@ in
 
   # This machine's own public key — referenced by IdentityFile in the ssh
   # config so the host consistently uses its designated key from the agent.
-  home.file.".ssh/${hostName}.pub".text = "${thisHostKey}\n";
+  home.file.".ssh/${hostName}.pub" = lib.mkIf isDarwin {
+    text = "${thisHostKey}\n";
+  };
 
   # Core CLI / shell tools
   programs.bash = {
@@ -176,7 +183,7 @@ in
     lfs.enable = true;
 
     # Sign commits with this host's SSH key, stored in 1Password (TouchID)
-    signing = {
+    signing = lib.mkIf isDarwin {
       format = "ssh";
       key = thisHostKey;
       signByDefault = true;
@@ -189,7 +196,7 @@ in
         tool = "meld";
       };
       pull.rebase = true;
-      gpg.ssh = {
+      gpg.ssh = lib.mkIf isDarwin {
         program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
         allowedSignersFile = "~/.ssh/allowed_signers";
       };
@@ -210,8 +217,10 @@ in
     shellWrapperName = "yy";
   };
 
-  targets.darwin.copyApps.enable = true;
-  targets.darwin.linkApps.enable = false;
+  targets.darwin = lib.mkIf isDarwin {
+    copyApps.enable = true;
+    linkApps.enable = false;
+  };
 
   # Indexing / completion
   programs.home-manager.enable = true;
@@ -230,6 +239,8 @@ in
         Port = 443;
         User = "git";
         # The agent offers every key in 1Password; pin this machine's own key
+      }
+      // lib.optionalAttrs isDarwin {
         IdentityFile = "~/.ssh/${hostName}.pub";
         IdentitiesOnly = "yes";
       };
@@ -237,6 +248,8 @@ in
       "*" = {
         StrictHostKeyChecking = "yes";
         # Use 1Password's SSH agent (TouchID) instead of the macOS agent
+      }
+      // lib.optionalAttrs isDarwin {
         IdentityAgent = ''"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'';
       };
     };
@@ -253,7 +266,7 @@ in
 
   # Point SSH_AUTH_SOCK at 1Password's agent too, for tools that don't read
   # ssh config (jj/libssh2, VS Code, ssh-add, ...)
-  home.sessionVariables = {
+  home.sessionVariables = lib.mkIf isDarwin {
     SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   };
 

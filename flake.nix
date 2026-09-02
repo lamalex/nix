@@ -18,6 +18,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     # Determinate Nix <-> nix-darwin integration: manages nix.enable = false,
@@ -25,7 +30,7 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
-  outputs = inputs@{ nixpkgs, nix-darwin, home-manager, nix-homebrew, ... }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, nix-homebrew, disko, ... }:
     let
       username = "alexlauni";
       system = "aarch64-darwin";
@@ -100,5 +105,35 @@
     in
     {
       darwinConfigurations = nixpkgs.lib.genAttrs darwinHosts mkDarwinConfiguration;
+
+      nixosConfigurations = {
+        Pakled = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit inputs username stateVersion;
+            hostName = "Pakled";
+            system = "x86_64-linux";
+          };
+          modules = [
+            inputs.determinate.nixosModules.default
+            disko.nixosModules.disko
+            home-manager.nixosModules.home-manager
+            ./hosts/nixos/Pakled
+          ];
+        };
+
+        pakled-installer = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs self; };
+          modules = [
+            inputs.determinate.nixosModules.default
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal-combined.nix"
+            ./hosts/nixos/Pakled/installer.nix
+          ];
+        };
+      };
+
+      packages.x86_64-linux.pakled-iso =
+        self.nixosConfigurations.pakled-installer.config.system.build.isoImage;
     };
 }

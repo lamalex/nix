@@ -1,5 +1,11 @@
-{ inputs, config, username, pkgs, lib, ... }:
 {
+  inputs,
+  config,
+  username,
+  pkgs,
+  lib,
+  ...
+}: {
   system.stateVersion = 5;
 
   system.primaryUser = username;
@@ -30,10 +36,25 @@
   # flake-registry at the generated file, which would break bare `nixpkgs#`
   # refs. The `u` pin lives in home/alexlauni.nix (user registry) instead.
   determinateNix.customSettings = {
-    extra-substituters = [ "https://moonrepo.cachix.org" ];
-    extra-trusted-substituters = [ "https://moonrepo.cachix.org" ];
-    extra-trusted-public-keys = [ "moonrepo.cachix.org-1:n4zm4mkV1Eoqck4mQvAhJM28EQwFLU7kW4dEbtAXbD8=" ];
+    cores = 8;
+    max-jobs = 1;
+    trusted-users = ["root" username];
+    extra-substituters = ["https://moonrepo.cachix.org"];
+    extra-trusted-substituters = ["https://moonrepo.cachix.org"];
+    extra-trusted-public-keys = ["moonrepo.cachix.org-1:n4zm4mkV1Eoqck4mQvAhJM28EQwFLU7kW4dEbtAXbD8="];
   };
+
+  # Determinate owns nix.conf and does not expose native-builder sizing through
+  # customSettings. Override only the generated builder invocation per client.
+  environment.variables.NIX_CONFIG = let
+    builder = builtins.toJSON [
+      {
+        program = "/usr/local/bin/determinate-nixd";
+        args = ["builder" "--memory-size" "17179869184" "--cpu-count" "8"];
+        systems = ["aarch64-linux" "x86_64-linux"];
+      }
+    ];
+  in "external-builders = ${lib.replaceStrings ["\""] ["\\\""] builder}";
 
   # Reload Determinate's nix-daemon when the custom nix config changes, so new
   # settings (substituters, ...) take effect without a manual kickstart.
@@ -47,7 +68,7 @@
     fi
   '';
 
-  environment.systemPath = [ "/opt/homebrew/bin" "/opt/homebrew/sbin" ];
+  environment.systemPath = ["/opt/homebrew/bin" "/opt/homebrew/sbin"];
 
   homebrew = {
     enable = true;
@@ -67,7 +88,6 @@
       "1password-cli"
       "visual-studio-code"
     ];
-
   };
 
   system.keyboard.enableKeyMapping = true;

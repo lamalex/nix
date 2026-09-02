@@ -43,6 +43,32 @@ Use one of the currently-defined hosts for `<host>`:
 
 After the first switch, run the same `darwin-rebuild` command from the repo root whenever you want to apply changes.
 
+## Pakled NixOS installer
+
+Build the x86_64 installer ISO through Determinate Nix's native Linux builder:
+
+```sh
+nix build path:$PWD#packages.x86_64-linux.pakled-iso
+```
+
+The ISO is written under `result/iso/`. Boot it on Pakled, connect Ethernet,
+and run:
+
+```sh
+install-pakled
+```
+
+The command refuses to erase a USB-backed `/dev/sda` and requires explicit
+confirmation before repartitioning `/dev/sda`. It installs the console-only
+`Pakled` configuration, copies this flake to `~/Code/nix`, and prompts for the
+`alexlauni` console password. SSH public-key login is preconfigured.
+
+After the first boot, join Pakled to the tailnet interactively:
+
+```sh
+sudo tailscale up
+```
+
 ## Adding a new host
 
 Hosts are auto-discovered from `hosts/darwin/` — the directory name becomes the

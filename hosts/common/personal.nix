@@ -14,15 +14,19 @@
 
   homebrew.masApps = { };
 
-  home-manager.users.${username}.programs = {
-    jujutsu.settings.user = {
-      name = "Alex Launi";
-      email = "dev@launi.me";
-    };
+  home-manager.users.${username} = {
+    imports = [ ../../home/radicle.nix ];
 
-    git.settings.user = {
-      name = "Alex Launi";
-      email = "dev@launi.me";
+    programs = {
+      jujutsu.settings.user = {
+        name = "Alex Launi";
+        email = "dev@launi.me";
+      };
+
+      git.settings.user = {
+        name = "Alex Launi";
+        email = "dev@launi.me";
+      };
     };
   };
 }
