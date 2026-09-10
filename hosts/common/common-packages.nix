@@ -88,6 +88,10 @@ in
     pkgs.bottom
     pkgsMaster.opencode
     opencodeV2
+    # devenv 2.3 — nixpkgs lags (2.2.2) and cotu needs 2.3 for portless.
+    # Requires https://devenv.cachix.org as a trusted substituter (set in
+    # darwin-common.nix), else nix builds it from source.
+    inputs.devenv.packages.${system}.default
     # Keep both until Apple container can cover Docker-style workflows.
     pkgs.container
     pkgs.orbstack

@@ -39,9 +39,21 @@
     cores = 8;
     max-jobs = 1;
     trusted-users = ["root" username];
-    extra-substituters = ["https://moonrepo.cachix.org"];
-    extra-trusted-substituters = ["https://moonrepo.cachix.org"];
-    extra-trusted-public-keys = ["moonrepo.cachix.org-1:n4zm4mkV1Eoqck4mQvAhJM28EQwFLU7kW4dEbtAXbD8="];
+    # devenv.cachix.org: without it, installing devenv from upstream builds it
+    # from source — including cachix's whole Haskell dependency tree. Key taken
+    # from https://app.cachix.org/api/v1/cache/devenv.
+    extra-substituters = [
+      "https://moonrepo.cachix.org"
+      "https://devenv.cachix.org"
+    ];
+    extra-trusted-substituters = [
+      "https://moonrepo.cachix.org"
+      "https://devenv.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "moonrepo.cachix.org-1:n4zm4mkV1Eoqck4mQvAhJM28EQwFLU7kW4dEbtAXbD8="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+    ];
   };
 
   # Determinate owns nix.conf and does not expose native-builder sizing through

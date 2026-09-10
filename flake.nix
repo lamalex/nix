@@ -28,6 +28,13 @@
     # Determinate Nix <-> nix-darwin integration: manages nix.enable = false,
     # /etc/nix/nix.custom.conf and /etc/determinate/config.json
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+
+    # devenv CLI (cotu's dev environment needs >= 2.3 for portless).
+    # Deliberately NO `inputs.nixpkgs.follows` — devenv pins its own nixpkgs, and
+    # overriding it changes every store path in its closure, which would throw
+    # away the devenv.cachix.org cache hit and make this build pingora's Rust
+    # crate tree from source (~1100 derivations) instead of a 110 MiB download.
+    devenv.url = "github:cachix/devenv/v2.3";
   };
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, nix-homebrew, disko, ... }:
