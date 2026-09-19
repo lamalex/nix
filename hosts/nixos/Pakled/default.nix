@@ -1,6 +1,5 @@
 {
   inputs,
-  lib,
   pkgs,
   username,
   stateVersion,
@@ -9,10 +8,6 @@
 }:
 {
   imports = [ ./disk-config.nix ];
-
-  # Work around nixpkgs#550124 when building Linux initrds on macOS.
-  boot.initrd.systemd.contents."/etc/terminfo/l/linux".source =
-    lib.mkForce "${pkgs.ncurses}/share/terminfo/l~nix~case~hack~1/linux";
 
   networking = {
     inherit hostName;
@@ -45,6 +40,7 @@
   };
 
   services.tailscale.enable = true;
+  services.fstrim.enable = true;
 
   environment.systemPackages = with pkgs; [
     git

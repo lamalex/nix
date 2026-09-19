@@ -53,7 +53,7 @@ let
   };
 in
 {
-  # Work around nixpkgs#550124 when building Linux initrds on macOS.
+  # Work around nixpkgs#550124 when building the ISO through macOS's Linux builder.
   boot.initrd.systemd.contents."/etc/terminfo/l/linux".source =
     lib.mkForce "${pkgs.ncurses}/share/terminfo/l~nix~case~hack~1/linux";
 
