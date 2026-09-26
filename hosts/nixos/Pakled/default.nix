@@ -7,7 +7,10 @@
   ...
 }:
 {
-  imports = [ ./disk-config.nix ];
+  imports = [
+    ./disk-config.nix
+    ./github-actions-runner.nix
+  ];
 
   networking = {
     inherit hostName;

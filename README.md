@@ -69,6 +69,39 @@ After the first boot, join Pakled to the tailnet interactively:
 sudo tailscale up
 ```
 
+### Pakled GitHub Actions runner and binary cache
+
+Pakled declares one ephemeral organization runner in the `yaffle-build-farm`
+runner group. Before activating it, create that group in the Yaffle GitHub
+organization and restrict it to the intended private repositories and workflow
+files. Then provision a fine-grained PAT with organization self-hosted runner
+read/write permission directly on Pakled:
+
+```sh
+sudo install -d -m 0700 /var/lib/github-runner
+printf '%s' "$GITHUB_RUNNER_PAT" | sudo tee /var/lib/github-runner/yaffle.token >/dev/null
+sudo chmod 0600 /var/lib/github-runner/yaffle.token
+```
+
+The token must not contain a trailing newline. It is intentionally absent from
+the flake and Nix store.
+
+Attic is colocated on Pakled and exposed only through the Tailscale interface.
+Generate its JWT signing secret on Pakled, outside the Nix store:
+
+```sh
+sudo install -d -m 0700 /var/lib/atticd-secret
+secret="$(openssl genrsa -traditional 4096 | base64 -w0)"
+printf 'ATTIC_SERVER_TOKEN_RS256_SECRET_BASE64=%s\n' "$secret" \
+  | sudo tee /var/lib/atticd-secret/atticd.env >/dev/null
+sudo chmod 0600 /var/lib/atticd-secret/atticd.env
+unset secret
+```
+
+After applying the configuration, use `atticd-atticadm` on Pakled to create the
+cache and separate read/write tokens. Pull-request runners should receive only
+read access; cache write tokens belong only in trusted main-branch workflows.
+
 ## Adding a new host
 
 Hosts are auto-discovered from `hosts/darwin/` — the directory name becomes the
