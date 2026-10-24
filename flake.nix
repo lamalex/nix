@@ -42,6 +42,10 @@
       username = "alexlauni";
       system = "aarch64-darwin";
       stateVersion = "24.11";
+      darwinPkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
 
       # Every directory under hosts/darwin is a host; its name becomes the host name.
       darwinHosts = builtins.attrNames (
@@ -129,7 +133,14 @@
         };
       };
 
-      packages.x86_64-linux.pakled-iso =
-        self.nixosConfigurations.pakled-installer.config.system.build.isoImage;
+      packages = {
+        aarch64-darwin = {
+          amp-cli = darwinPkgs.callPackage ./pkgs/amp-cli { };
+          amp-desktop = darwinPkgs.callPackage ./pkgs/amp-desktop { };
+        };
+
+        x86_64-linux.pakled-iso =
+          self.nixosConfigurations.pakled-installer.config.system.build.isoImage;
+      };
     };
 }

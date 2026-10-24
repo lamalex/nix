@@ -1,9 +1,14 @@
 { pkgs, ... }:
 {
-  imports = [ ../../common/personal.nix ];
+  imports = [
+    ../../common/personal.nix
+    ../../../modules/darwin/amp.nix
+  ];
+
+  programs.amp.enable = true;
 
   environment.systemPackages = with pkgs; [
-    signal-desktop 
+    signal-desktop
   ];
 
   # Any host-only quirks:
@@ -11,4 +16,3 @@
   # - docking / UI defaults unique to this device
   # - per-host packages
 }
-
