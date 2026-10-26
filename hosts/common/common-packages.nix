@@ -1,21 +1,5 @@
 { pkgs, inputs, system, ... }:
 let
-  pkgsMaster = import inputs.nixpkgs-master {
-    inherit system;
-    config.allowUnfree = true;
-  };
-
-  upstreamOpencode = inputs.opencode.packages.${system}.opencode.override {
-    # The v2 branch's aarch64-darwin node-modules hash is currently stale.
-    node_modules = inputs.opencode.packages.${system}.node_modules_updater.override {
-      hash = "sha256-yCYPwLVy+or9iW9QpCO3e1D0yGDSiPB9dx94Llt7M6o=";
-    };
-  };
-  opencodeV2 = pkgs.runCommand "opencode-v2-${upstreamOpencode.version}" { } ''
-    mkdir -p $out/bin
-    ln -s ${upstreamOpencode}/bin/opencode $out/bin/opencode-v2
-  '';
-
   hunkVersion = "0.10.0";
   hunkArtifacts = {
     aarch64-darwin = {
@@ -86,8 +70,6 @@ in
     pkgs.sd
     pkgs.pandoc
     pkgs.bottom
-    pkgsMaster.opencode
-    opencodeV2
     # devenv 2.3 — nixpkgs lags (2.2.2) and cotu needs 2.3 for portless.
     # Requires https://devenv.cachix.org as a trusted substituter (set in
     # darwin-common.nix), else nix builds it from source.
