@@ -160,6 +160,7 @@ in
   programs.nushell = {
     enable = true;
     configFile.source = ./nu/config.nu;
+    loadSessionVariables = true;
   };
 
   programs.carapace = {

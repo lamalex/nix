@@ -92,8 +92,6 @@ in
     # Requires https://devenv.cachix.org as a trusted substituter (set in
     # darwin-common.nix), else nix builds it from source.
     inputs.devenv.packages.${system}.default
-    # Keep both until Apple container can cover Docker-style workflows.
-    pkgs.container
     pkgs.orbstack
     pkgs.glow
     pkgs.ouch

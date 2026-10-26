@@ -43,17 +43,6 @@
       system = "aarch64-darwin";
       stateVersion = "24.11";
 
-      # Overlay to update container to 0.10.0
-      containerOverlay = final: prev: {
-        container = prev.container.overrideAttrs (oldAttrs: rec {
-          version = "0.10.0";
-          src = final.fetchurl {
-            url = "https://github.com/apple/container/releases/download/${version}/container-${version}-installer-signed.pkg";
-            hash = "sha256-xIHONVUk0DbDzdrH/SgeMXlNQGkL+aIfcy7z12+p/gg=";
-          };
-        });
-      };
-
       # Every directory under hosts/darwin is a host; its name becomes the host name.
       darwinHosts = builtins.attrNames (
         nixpkgs.lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./hosts/darwin)
@@ -73,7 +62,7 @@
 
           ({ ... }: {
             determinateNix.enable = true;
-            nixpkgs.overlays = [ containerOverlay ];
+            nixpkgs.overlays = [ ];
 
             networking.hostName = hostName;
             networking.localHostName = hostName;
