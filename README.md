@@ -43,6 +43,52 @@ Use one of the currently-defined hosts for `<host>`:
 
 After the first switch, run the same `darwin-rebuild` command from the repo root whenever you want to apply changes.
 
+## Rex
+
+Personal Macs install the pinned Rex beta app, bundled local server, and `rex`
+CLI through `programs.rex`. Apply the host configuration as above, then open
+`Rex Beta` from Applications. Rex requires macOS 15 or newer.
+
+Bash, Zsh, and Fish preserve Rex's `REX_BIN_DIR` at the front of `PATH` so
+terminals use the CLI supplied by their server. Rex works without an initial
+configuration file; custom settings can go in `~/.config/rex/init.lua`.
+
+Build just the package without switching the system:
+
+```sh
+nix build path:$PWD#rex
+```
+
+Automatic app updates stay disabled so the app and CLI remain pinned together
+and can be restored by a system rollback. `nix flake update` updates flake inputs;
+it does not change the Rex pin.
+
+From this checkout, check for or prepare a Rex update:
+
+```sh
+nix run path:$PWD#update-rex -- --check
+nix run path:$PWD#update-rex
+```
+
+After applying a configuration with Rex enabled, `update-rex` is also on PATH.
+Run it from this checkout (or pass the checkout directory as an argument).
+The command reads Rex's snapshot feed, downloads the latest full DMG, builds it
+with the flake's locked nixpkgs, and verifies the app's signatures, Superlogical
+signing identity, bundle version, and CLI before updating `pkgs/rex/source.json`.
+If validation fails, the pin stays unchanged. It does not switch the system or
+restart Rex.
+
+Review the pin change, then apply the host configuration as above. To restore
+the previous retained system generation, quit Rex and run:
+
+```sh
+sudo darwin-rebuild --rollback
+```
+
+Reopen Rex afterward so its app and server use the restored version. Retain old
+system generations for rollback; Rex settings and session data are not rolled
+back by Nix.
+
 ## Pakled NixOS installer
 
 Build the x86_64 installer ISO through Determinate Nix's native Linux builder:

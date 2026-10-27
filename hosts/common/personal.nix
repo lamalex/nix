@@ -18,6 +18,10 @@ let
   '';
 in
 {
+  imports = [ ../../modules/darwin/rex.nix ];
+
+  programs.rex.enable = true;
+
   environment.systemPackages = [
     pkgsMaster.opencode
     opencodeV2
@@ -37,7 +41,7 @@ in
   homebrew.masApps = { };
 
   home-manager.users.${username} = {
-    imports = [ ../../home/radicle.nix ];
+    imports = [ ];
 
     programs = {
       jujutsu.settings.user = {

@@ -137,6 +137,8 @@
         aarch64-darwin = {
           amp-cli = darwinPkgs.callPackage ./pkgs/amp-cli { };
           amp-desktop = darwinPkgs.callPackage ./pkgs/amp-desktop { };
+          rex = darwinPkgs.callPackage ./pkgs/rex { };
+          update-rex = darwinPkgs.callPackage ./pkgs/update-rex { };
         };
 
         x86_64-linux.pakled-iso =

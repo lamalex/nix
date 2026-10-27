@@ -4,6 +4,13 @@ let
   shellAliases = {
     cat = "${pkgs.bat}/bin/bat";
   };
+  # Nix resets PATH during shell startup. Keep the CLI supplied by the Rex
+  # server first so it matches the running server, including remote sessions.
+  rexShellInit = ''
+    if [ -n "$REX_BIN_DIR" ]; then
+      export PATH="$REX_BIN_DIR:$PATH"
+    fi
+  '';
 
   # Per-host SSH identity keys. Each is a separate SSH Key item in 1Password
   # named after the machine. 1Password syncs items to every device, so this
@@ -63,6 +70,7 @@ in
   programs.bash = {
     enable = true;
     shellAliases = shellAliases;
+    initExtra = lib.mkAfter rexShellInit;
   };
 
   programs.zsh = {
@@ -70,9 +78,10 @@ in
     enableCompletion = true;
     autosuggestion.enable = true;
     shellAliases = shellAliases;
-    initContent = ''
+    initContent = lib.mkAfter ''
       # Copy bat completions to cat alias
       compdef cat=bat
+      ${rexShellInit}
     '';
     # initContent = builtins.readFile ../mac-dot-zshrc;
   };
@@ -80,9 +89,12 @@ in
   programs.fish = {
     enable = true;
     shellAliases = shellAliases;
-    interactiveShellInit = ''
+    interactiveShellInit = lib.mkAfter ''
       # Copy bat completions to cat alias
       complete -c cat -w bat
+      if set -q REX_BIN_DIR; and test -n "$REX_BIN_DIR"
+        fish_add_path --path --prepend --move "$REX_BIN_DIR"
+      end
     '';
   };
 
